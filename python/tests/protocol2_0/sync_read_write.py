@@ -61,12 +61,12 @@ LEN_PRO_PRESENT_POSITION    = 4
 PROTOCOL_VERSION            = 2.0               # See which protocol version is used in the Dynamixel
 
 # Default setting
-DXL1_ID                     = 1                 # Dynamixel#1 ID : 1
-DXL2_ID                     = 2                 # Dynamixel#1 ID : 2
-BAUDRATE                    = 57600             # Dynamixel default baudrate : 57600
+DXL1_ID                     = 0                 # Dynamixel#1 ID : 1
+DXL2_ID                     = 1                 # Dynamixel#1 ID : 2
+BAUDRATE                    = 2000000             # Dynamixel default baudrate : 57600
 DEVICENAME                  = '/dev/ttyUSB0'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
-
+MAX_POS = 4096
 TORQUE_ENABLE               = 1                 # Value for enabling the torque
 TORQUE_DISABLE              = 0                 # Value for disabling the torque
 DXL_MINIMUM_POSITION_VALUE  = 100           # Dynamixel will rotate between this value
@@ -74,7 +74,8 @@ DXL_MAXIMUM_POSITION_VALUE  = 4000            # and this value (note that the Dy
 DXL_MOVING_STATUS_THRESHOLD = 20                # Dynamixel moving status threshold
 
 index = 0
-dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE, DXL_MAXIMUM_POSITION_VALUE]         # Goal position
+dxl0_goal_position = [MAX_POS // 2, MAX_POS // 2]         # Goal position
+dxl1_goal_position = [0, 0]
 
 
 # Initialize PortHandler instance
@@ -149,7 +150,7 @@ while 1:
         break
 
     # Allocate goal position value into byte array
-    param_goal_position = [DXL_LOBYTE(DXL_LOWORD(dxl_goal_position[index])), DXL_HIBYTE(DXL_LOWORD(dxl_goal_position[index])), DXL_LOBYTE(DXL_HIWORD(dxl_goal_position[index])), DXL_HIBYTE(DXL_HIWORD(dxl_goal_position[index]))]
+    param_goal_position = [DXL_LOBYTE(DXL_LOWORD(dxl0_goal_position[index])), DXL_HIBYTE(DXL_LOWORD(dxl0_goal_position[index])), DXL_LOBYTE(DXL_HIWORD(dxl1_goal_position[index])), DXL_HIBYTE(DXL_HIWORD(dxl1_goal_position[index]))]
 
     # Add Dynamixel#1 goal position value to the Syncwrite parameter storage
     dxl_addparam_result = groupSyncWrite.addParam(DXL1_ID, param_goal_position)
@@ -195,9 +196,9 @@ while 1:
         # Get Dynamixel#2 present position value
         dxl2_present_position = groupSyncRead.getData(DXL2_ID, ADDR_PRO_PRESENT_POSITION, LEN_PRO_PRESENT_POSITION)
 
-        print("[ID:%03d] GoalPos:%03d  PresPos:%03d\t[ID:%03d] GoalPos:%03d  PresPos:%03d" % (DXL1_ID, dxl_goal_position[index], dxl1_present_position, DXL2_ID, dxl_goal_position[index], dxl2_present_position))
+        print("[ID:%03d] GoalPos:%03d  PresPos:%03d\t[ID:%03d] GoalPos:%03d  PresPos:%03d" % (DXL1_ID, dxl0_goal_position[index], dxl1_present_position, DXL2_ID, dxl1_goal_position[index], dxl2_present_position))
 
-        if not ((abs(dxl_goal_position[index] - dxl1_present_position) > DXL_MOVING_STATUS_THRESHOLD) and (abs(dxl_goal_position[index] - dxl2_present_position) > DXL_MOVING_STATUS_THRESHOLD)):
+        if not ((abs(dxl0_goal_position[index] - dxl1_present_position) > DXL_MOVING_STATUS_THRESHOLD) and (abs(dxl1_goal_position[index] - dxl2_present_position) > DXL_MOVING_STATUS_THRESHOLD)):
             break
 
     # Change goal position
