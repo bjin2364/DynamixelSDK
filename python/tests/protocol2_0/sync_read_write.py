@@ -75,7 +75,7 @@ DXL_MOVING_STATUS_THRESHOLD = 20                # Dynamixel moving status thresh
 
 index = 0
 dxl0_goal_position = [MAX_POS // 2, MAX_POS // 2]         # Goal position
-dxl1_goal_position = [0, 0]
+dxl1_goal_position = [int(79.05/360*4096), int(10.95/360*4096)]
 
 
 # Initialize PortHandler instance
@@ -198,9 +198,13 @@ while 1:
 
         print("[ID:%03d] GoalPos:%03d  PresPos:%03d\t[ID:%03d] GoalPos:%03d  PresPos:%03d" % (DXL1_ID, dxl0_goal_position[index], dxl1_present_position, DXL2_ID, dxl1_goal_position[index], dxl2_present_position))
 
-        if not ((abs(dxl0_goal_position[index] - dxl1_present_position) > DXL_MOVING_STATUS_THRESHOLD) and (abs(dxl1_goal_position[index] - dxl2_present_position) > DXL_MOVING_STATUS_THRESHOLD)):
+        e1 = abs(dxl0_goal_position[index] - dxl1_present_position)
+        e2 = abs(dxl1_goal_position[index] - dxl2_present_position)
+
+        if (e1 < DXL_MOVING_STATUS_THRESHOLD) and (e2 < DXL_MOVING_STATUS_THRESHOLD):
             break
 
+    print("e1: {0}, e2: {1}".format(e1,e2))
     # Change goal position
     if index == 0:
         index = 1
