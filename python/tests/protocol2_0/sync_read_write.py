@@ -74,8 +74,8 @@ DXL_MAXIMUM_POSITION_VALUE  = 4000            # and this value (note that the Dy
 DXL_MOVING_STATUS_THRESHOLD = 20                # Dynamixel moving status threshold
 
 index = 0
-dxl0_goal_position = [MAX_POS // 2, MAX_POS // 2]         # Goal position
-dxl1_goal_position = [int(79.05/360*4096), int(10.95/360*4096)]
+dxl0_goal_position = [MAX_POS // 2, MAX_POS // 4]         # Goal position
+dxl1_goal_position = [MAX_POS // 2, MAX_POS // 4]
 
 
 # Initialize PortHandler instance
@@ -204,7 +204,7 @@ while 1:
         if (e1 < DXL_MOVING_STATUS_THRESHOLD) and (e2 < DXL_MOVING_STATUS_THRESHOLD):
             break
 
-    print("e1: {0}, e2: {1}".format(e1,e2))
+        print("e1: {0}, e2: {1}".format(e1,e2))
     # Change goal position
     if index == 0:
         index = 1
